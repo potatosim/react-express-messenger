@@ -1,0 +1,51 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - messages_network
+
+  mongo-express:
+    image: mongo-express:1.0.0-20
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
+    networks:
+      - messages_network
+  
+  backend:
+    container_name: backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=PROD
+      - MONGODB_URI=mongodb://root:example@mongodb:27017
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    networks:
+      - messages_network
+
+volumes:
+  mongo_data:
+
+networks:
+  messages_network:
+    driver: bridge
