@@ -1,35 +1,13 @@
 import { PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, notification } from 'antd';
-import type { RuleObject } from 'antd/es/form';
 import { useState } from 'react';
-import {
-  isValidationError,
-  postMessage,
-} from '../../services/postMessage.mutation';
 
-export interface IFormValues {
-  name: string;
-  phone: string;
-  message: string;
-}
-const BY_PHONE_REGEX =
-  /^(?:\+375|80)[\s-]?(?:17|25|29|33|44)[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$/;
-
-const validatePhone = (_: RuleObject, value: string) => {
-  if (!value) {
-    return Promise.reject(new Error('Please,enter phone number'));
-  }
-  const v = value.replace(/\s+/g, '');
-  if (BY_PHONE_REGEX.test(v)) {
-    return Promise.resolve();
-  }
-  return Promise.reject(
-    new Error('Use the Belarusian phone format — +375XXxxxxxxx or 80XXxxxxxxx.')
-  );
-};
+import { createMessage, type IMessageDto } from './config';
+import { notifyRequestErrors } from '@/utils/requestHelpers';
+import { phoneValidationRule } from '@/utils/validationHelpers';
 
 const SendMessagePage = () => {
-  const [form] = Form.useForm<IFormValues>();
+  const [form] = Form.useForm<IMessageDto>();
   const [isLoading, setIsLoading] = useState(false);
 
   const [api, contextHolder] = notification.useNotification({
@@ -38,41 +16,28 @@ const SendMessagePage = () => {
     },
   });
 
-  const sendMessage = async () => {
+  const sendMessage = async (formData: IMessageDto) => {
     try {
-      await form.validateFields();
-
-      const body = form.getFieldsValue();
-
       setIsLoading(true);
-      postMessage({
-        body,
-        onSuccess: (data) => {
-          form.resetFields();
-          api.success({
-            message: `${data.name}, Your message has been received!`,
-          });
-        },
-        onError: (err) => {
-          if (isValidationError(err)) {
-            err.response?.data.errors.map((error) => {
-              api.error({
-                message: error.msg,
-              });
-            });
-            return;
-          }
-          api.error({
-            message: 'Something went wrong!',
-          });
-        },
-        onFinish: () => setIsLoading(false),
+
+      const { data } = await createMessage(formData);
+
+      api.success({
+        message: `${data.name}, Your message has been received!`,
       });
-    } catch {
-      api.error({
-        message: 'Validation Error!',
-      });
+
+      form.resetFields();
+    } catch (err) {
+      notifyRequestErrors(err, api);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleValidationFailed = () => {
+    api.error({
+      message: 'Validation Error!',
+    });
   };
 
   return (
@@ -82,7 +47,9 @@ const SendMessagePage = () => {
         form={form}
         name="contact"
         scrollToFirstError
-        style={{ width: '60%', margin: '0 auto' }}>
+        style={{ width: '60%', margin: '0 auto' }}
+        onFinish={sendMessage}
+        onFinishFailed={handleValidationFailed}>
         <Form.Item
           label="Name"
           name="name"
@@ -96,7 +63,7 @@ const SendMessagePage = () => {
           label="Phone "
           name="phone"
           required
-          rules={[{ validator: validatePhone }]}>
+          rules={[phoneValidationRule()]}>
           <Input prefix={<PhoneOutlined />} placeholder="+37529*******" />
         </Form.Item>
         <Form.Item
@@ -111,7 +78,6 @@ const SendMessagePage = () => {
         <Form.Item>
           <Button
             disabled={isLoading}
-            onClick={sendMessage}
             variant="solid"
             color="volcano"
             htmlType="submit">
