@@ -28,40 +28,6 @@ services:
     networks:
       - messages_network
   
-  backend:
-    container_name: backend
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    env_file:
-      - ./server/.env
-    environment:
-      - ENVIRONMENT=PROD
-    #   - PORT=3000
-    #   - MONGODB_USERNAME=root
-    #   - MONGODB_PASSWORD=example
-      - MONGODB_HOST=mongodb
-    #   - MONGODB_PORT=27017    
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongo
-    networks:
-      - messages_network
-
-  client: 
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_URL=/api
-    ports:
-      - "8080:80"
-    depends_on:
-      - backend
-    networks:
-      - messages_network
-
 volumes:
   mongo_data:
 

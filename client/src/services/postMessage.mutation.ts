@@ -14,7 +14,7 @@ export const postMessage = async ({
 }) => {
   try {
     const { data } = await axios.post<{ data: IFormValues; success: boolean }>(
-      'http://localhost:3000/api/messages',
+      `${import.meta.env.VITE_API_URL}/messages`,
       body
     );
 
