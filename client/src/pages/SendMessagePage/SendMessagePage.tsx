@@ -17,16 +17,14 @@ const BY_PHONE_REGEX =
 
 const validatePhone = (_: RuleObject, value: string) => {
   if (!value) {
-    return Promise.reject(new Error('Пожалуйста, укажите телефон'));
+    return Promise.reject(new Error('Please,enter phone number'));
   }
   const v = value.replace(/\s+/g, '');
   if (BY_PHONE_REGEX.test(v)) {
     return Promise.resolve();
   }
   return Promise.reject(
-    new Error(
-      'Телефон должен быть в белорусском формате: +375XXxxxxxxx или 80XXxxxxxxx'
-    )
+    new Error('Use the Belarusian phone format — +375XXxxxxxxx or 80XXxxxxxxx.')
   );
 };
 
@@ -52,7 +50,7 @@ const SendMessagePage = () => {
         onSuccess: (data) => {
           form.resetFields();
           api.success({
-            message: `${data.name}, Ваше сообщение получено!`,
+            message: `${data.name}, Your message has been received!`,
           });
         },
         onError: (err) => {
@@ -65,14 +63,14 @@ const SendMessagePage = () => {
             return;
           }
           api.error({
-            message: 'Что-то пошло не так!',
+            message: 'Something went wrong!',
           });
         },
         onFinish: () => setIsLoading(false),
       });
     } catch {
       api.error({
-        message: 'Ошибка валидации',
+        message: 'Validation Error!',
       });
     }
   };
@@ -86,28 +84,29 @@ const SendMessagePage = () => {
         scrollToFirstError
         style={{ width: '60%', margin: '0 auto' }}>
         <Form.Item
-          label="Имя"
+          label="Name"
           name="name"
           rules={[
-            { required: true, message: 'Пожалуйста, введите имя' },
-            { min: 2, message: 'Минимум 2 символа' },
+            { required: true, message: 'Please, enter name' },
+            { min: 2, message: 'Minimum 2 chars' },
           ]}>
-          <Input prefix={<UserOutlined />} placeholder="Имя" />
+          <Input prefix={<UserOutlined />} placeholder="Name" />
         </Form.Item>
         <Form.Item
-          label="Телефон"
+          label="Phone "
           name="phone"
+          required
           rules={[{ validator: validatePhone }]}>
           <Input prefix={<PhoneOutlined />} placeholder="+37529*******" />
         </Form.Item>
         <Form.Item
-          label="Сообщение"
+          label="Message"
           name="message"
           rules={[
-            { required: true, message: 'Пожалуйста, введите сообщение' },
-            { min: 2, message: 'Минимум 2 символа' },
+            { required: true, message: 'Please, enter message' },
+            { min: 2, message: 'Minimum 2 chars' },
           ]}>
-          <Input.TextArea rows={4} placeholder="Ваше сообщение" />
+          <Input.TextArea rows={4} placeholder="Type your message..." />
         </Form.Item>
         <Form.Item>
           <Button
@@ -116,7 +115,7 @@ const SendMessagePage = () => {
             variant="solid"
             color="volcano"
             htmlType="submit">
-            Отправить
+            Send
           </Button>
         </Form.Item>
       </Form>

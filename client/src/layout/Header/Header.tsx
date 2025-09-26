@@ -7,7 +7,7 @@ const Header = () => {
   const navigate = useNavigate();
   return (
     <header className="flex justify-between items-center p-[1rem]">
-      <Tooltip title="На главную">
+      <Tooltip title="Home">
         <Button
           onClick={() => {
             navigate(APP_ROUTES.MAIN);

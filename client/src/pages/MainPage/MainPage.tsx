@@ -7,17 +7,17 @@ const MainPage = () => {
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center gap-12 text-center p-10">
-      <Title> Добро пожаловать!</Title>
+      <Title>Welcome!</Title>
       <Title level={2}>
-        Мы рады приветствовать Вас в нашем сервисе по отправке сообщений. Чтобы
-        начать работу и перейти к отправке сообщений нажмите кнопку "Далее".
+        We are happy to see you in our messaging service. To get started and
+        begin sending messages, click the "Next" button.
       </Title>
       <Button
         variant="solid"
         color="volcano"
         size="large"
         onClick={() => navigate(APP_ROUTES.SEND_MESSAGE)}>
-        Далее
+        Next
       </Button>
     </div>
   );

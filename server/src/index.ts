@@ -19,8 +19,8 @@ const bootstrap = async () => {
   app.use('/api', messagesRouter);
 
   await mongoose.connect(getMongoConnectionUri());
-  console.log('MongoDB подключен');
-  app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
+  console.log('MongoDB is connected');
+  app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 };
 
 bootstrap();
